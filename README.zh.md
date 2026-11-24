@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-> 插件标识 `dsh-plugin-session-bus` · DSH `0.2.2-rc.5` · MIT
+> 插件标识 `dsh-collab-conversations` · DSH `0.2.2-rc.5` · MIT
 
 给 DeepSeek Harness 加一条**会话间派单 / 读回**通道：一个主对话拿到另外几个会话的 `sessionId`，就能把任务递过去，并在需要时读回它们的结论——而两边各自保留自己的上下文，互不污染。只走一条显式消息和一段显式投影。
 
@@ -52,6 +52,29 @@ flowchart LR
 
 - **适合**：把活分给几个已经开着的会话；让某个会话去查一件事再回报；主线汇总多条支线结论。
 - **不适合**：需要强隔离的不可信场景（权限只能提示，不能强制）；需要任务跨 Harness 重启存活的场景（链状态在进程内，30 分钟 TTL）。
+
+## 同类项目
+
+跨会话通信是 DSH 插件生态里最挤的一个角落，这份实现不是第一个。老实说：**`donyue7/dsh-session-bus` 的功能完整度远高于这里**，这一个更窄，重心放在**派单权**上。
+
+| 项目 | 范围 | 与本项目的关系 |
+|---|---|---|
+| [`donyue7/dsh-session-bus`](https://github.com/donyue7/dsh-session-bus)（npm `dsh-session-bus`） | 12 个工具：list / find / send / read / spawn / roles / tasks / attention / leases / threads | 功能上的**超集**：按线程落盘的跳数预算、四档投递语义、写租约、任务账本、审计日志。要最全的工具、跨重启不丢状态、跨工作区投递，选它 |
+| [`ybh1291747665/dsh-peer-bus`](https://github.com/ybh1291747665/dsh-peer-bus) | `bus_send` / `bus_roster` | 思路最接近，而且**更严**：默认拒绝的白名单。本插件没有（见下方“权限边界是提示性的”）。要把不可信会话隔开，选它 |
+| [`NanmiCoder/dsh-agent-teams`](https://github.com/NanmiCoder/dsh-agent-teams) | Agent 团队、任务分配、并行执行 | 形态不同：一个协调者带一队 agent，不是各自有用户的平级会话。DSH 本体也自带 `dsh-agent-team` |
+| [`philomelcc/dsh-interaction`](https://github.com/philomelcc/dsh-interaction) · [`tonyzdev/dsh-session-messaging`](https://github.com/tonyzdev/dsh-session-messaging) · [`LaoYueHanNi/dsh-session-tools`](https://github.com/LaoYueHanNi/dsh-session-tools) · [`lzlrt/dsh-cross-session`](https://github.com/lzlrt/dsh-cross-session) · [`shutongX/dsh-session-message`](https://github.com/shutongX/dsh-session-message) · [`BigBugy/dsh-tool-session-message`](https://github.com/BigBugy/dsh-tool-session-message) · [`@yuanchilin/dsh-mailbox`](https://www.npmjs.com/package/@yuanchilin/dsh-mailbox) | 每个一两个工具：发 / 列 / 读，部分带新建或跨工作区 | 同一个原语，面积更小。其中几项做到了本插件没有的事：新建会话、跨工作区投递、基于文件的信箱 |
+
+### 这一个真正多出来的东西
+
+- **派单权是闸门，不是计数器** —— 见下方“拓扑闸门”。
+- **回复不吃下一跳预算，转手一定吃。**
+- **读回不唤醒对端** —— 只返回只读投影。
+
+### 它刻意不做的事
+
+- **没有白名单 / 默认拒绝。** 权限是提示性的；需要按策略隔离会话，用 `dsh-peer-bus`。
+- **不跨重启持久化。** 链状态在进程内，30 分钟 TTL。
+- **不做跨工作区投递、会话新建、任务账本、写租约。**
 
 ## 工具
 
@@ -176,7 +199,7 @@ v0.3.1 起 `src/index.ts` 只有具名导出，`test/logic.test.mjs` 开头三�
 
 ```yaml
 - id: session-bus
-  name: "dsh-plugin-session-bus"
+  name: "dsh-collab-conversations"
   config:
     topology: star
     maxHops: 3
@@ -192,7 +215,7 @@ v0.3.1 起 `src/index.ts` 只有具名导出，`test/logic.test.mjs` 开头三�
 三步，全部在 PowerShell 里做。**动配置前先备份** `~/.dsh/sessions`、`~/.dsh/storages` 和 `profiles/desktop/cordis.patch.yml`。
 
 ```powershell
-Copy-Item -Recurse -Force .\dsh-plugin-session-bus "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\"
+Copy-Item -Recurse -Force .\dsh-collab-conversations "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\"
 ```
 
 然后往 `~/.dsh/profiles/desktop/cordis.patch.yml` 末尾追加一段 **`insert`**：
@@ -200,7 +223,7 @@ Copy-Item -Recurse -Force .\dsh-plugin-session-bus "$env:USERPROFILE\.dsh\profil
 ```yaml
 - insert:
     - id: session-bus
-      name: "dsh-plugin-session-bus"
+      name: "dsh-collab-conversations"
       config:
         topology: star
         maxHops: 3

@@ -2,7 +2,7 @@
 
 **English** | [中文](README.zh.md)
 
-> Plugin id: `dsh-plugin-session-bus` · DSH `0.2.2-rc.5` · MIT
+> Plugin id: `dsh-collab-conversations` · DSH `0.2.2-rc.5` · MIT
 
 Give DeepSeek Harness a **cross-session dispatch / read-back** channel: one conversation holds the `sessionId`s of its siblings, hands them tasks, and later reads their conclusions back — each side keeps its own context, and nothing is shared but an explicit message and an explicit projection.
 
@@ -52,6 +52,29 @@ Three boundaries, which are also its design premises:
 
 - **Use it**: split work across sessions that are already open; have one session investigate something and report back; have a main line aggregate conclusions from several branches.
 - **Don't**: untrusted scenarios that need hard isolation (permissions are advisory, not enforced); tasks that must survive a Harness restart (chain state is in-process, 30-minute TTL).
+
+## Prior art
+
+Cross-session messaging is a crowded corner of the DSH plugin ecosystem, and this plugin is not the first. The honest summary: [`donyue7/dsh-session-bus`](https://github.com/donyue7/dsh-session-bus) is far more feature-complete; this one is narrower and puts its weight on **dispatch authority**.
+
+| Project | Scope | How it relates |
+|---|---|---|
+| [`donyue7/dsh-session-bus`](https://github.com/donyue7/dsh-session-bus) (npm `dsh-session-bus`) | 12 tools: list / find / send / read / spawn / roles / tasks / attention / leases / threads | A **superset** in features: per-thread hop budget persisted to disk, four delivery modes, write leases, task ledger, audit log. Prefer it for the fullest toolset, restart-safe state, or cross-workspace delivery |
+| [`ybh1291747665/dsh-peer-bus`](https://github.com/ybh1291747665/dsh-peer-bus) | `bus_send` / `bus_roster` | Closest in spirit **and stricter**: a default-deny allowlist. This plugin has none (see "advisory, not mechanical" below). Prefer it when untrusted sessions must be kept apart |
+| [`NanmiCoder/dsh-agent-teams`](https://github.com/NanmiCoder/dsh-agent-teams) | Agent teams, task assignment, parallel execution | A different shape: a team of agents under one coordinator, not peer sessions that each keep their own user. DSH also ships a first-party `dsh-agent-team` bundle |
+| [`philomelcc/dsh-interaction`](https://github.com/philomelcc/dsh-interaction) · [`tonyzdev/dsh-session-messaging`](https://github.com/tonyzdev/dsh-session-messaging) · [`LaoYueHanNi/dsh-session-tools`](https://github.com/LaoYueHanNi/dsh-session-tools) · [`lzlrt/dsh-cross-session`](https://github.com/lzlrt/dsh-cross-session) · [`shutongX/dsh-session-message`](https://github.com/shutongX/dsh-session-message) · [`BigBugy/dsh-tool-session-message`](https://github.com/BigBugy/dsh-tool-session-message) · [`@yuanchilin/dsh-mailbox`](https://www.npmjs.com/package/@yuanchilin/dsh-mailbox) | One or two tools each: send / list / read, some with spawn or cross-workspace | The same primitive with a smaller surface. Several do things this plugin does not: session creation, cross-workspace delivery, file-based mailboxes |
+
+### What this one actually adds
+
+- **Dispatch authority is a gate, not a counter** — see "Topology gate" below.
+- **A reply never consumes the next hop's budget; a relay always does.**
+- **Reading never wakes the peer** — it returns a read-only projection.
+
+### What it deliberately does not do
+
+- **No allowlist / default-deny.** Permissions are advisory; use `dsh-peer-bus` if you need sessions kept apart by policy.
+- **No persistence across restarts.** Chain state is in-process with a 30-minute TTL.
+- **No cross-workspace delivery, session creation, task ledger, or write leases.**
 
 ## Tools
 
@@ -178,7 +201,7 @@ Delivered messages use `source: { kind: 'user' }`, with a source header (`from` 
 
 ```yaml
 - id: session-bus
-  name: "dsh-plugin-session-bus"
+  name: "dsh-collab-conversations"
   config:
     topology: star
     maxHops: 3
@@ -194,7 +217,7 @@ Delivered messages use `source: { kind: 'user' }`, with a source header (`from` 
 Three steps, all in PowerShell. **Back up** `~/.dsh/sessions`, `~/.dsh/storages` and `profiles/desktop/cordis.patch.yml` before touching config.
 
 ```powershell
-Copy-Item -Recurse -Force .\dsh-plugin-session-bus "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\"
+Copy-Item -Recurse -Force .\dsh-collab-conversations "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\"
 ```
 
 Then append an **`insert`** entry to the end of `~/.dsh/profiles/desktop/cordis.patch.yml`:
@@ -202,7 +225,7 @@ Then append an **`insert`** entry to the end of `~/.dsh/profiles/desktop/cordis.
 ```yaml
 - insert:
     - id: session-bus
-      name: "dsh-plugin-session-bus"
+      name: "dsh-collab-conversations"
       config:
         topology: star
         maxHops: 3

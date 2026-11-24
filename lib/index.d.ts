@@ -14,7 +14,7 @@
  * - Dispatch depth is carried per task chain and floored by the SDK's durable
  *   `SessionHeader.delegationDepth`, so a reply does not ratchet the chain.
  *
- * @module dsh-plugin-session-bus
+ * @module dsh-collab-conversations
  */
 import type { Context } from '@deepseek-ai/cordis';
 import z from '@deepseek-ai/schemastery';

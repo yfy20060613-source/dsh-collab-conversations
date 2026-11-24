@@ -1,5 +1,5 @@
 {
-  "name": "dsh-plugin-session-bus",
+  "name": "dsh-collab-conversations",
   "version": "0.3.1",
   "description": "Cross-session dispatch and read-back for DeepSeek Harness: address a sibling conversation by session id, hand it a task, and read its conclusions back without sharing transcripts.",
   "type": "module",
@@ -28,12 +28,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yfy20060613-source/dsh-plugin-session-bus.git"
+    "url": "git+https://github.com/yfy20060613-source/dsh-collab-conversations.git"
   },
   "bugs": {
-    "url": "https://github.com/yfy20060613-source/dsh-plugin-session-bus/issues"
+    "url": "https://github.com/yfy20060613-source/dsh-collab-conversations/issues"
   },
-  "homepage": "https://github.com/yfy20060613-source/dsh-plugin-session-bus#readme",
+  "homepage": "https://github.com/yfy20060613-source/dsh-collab-conversations#readme",
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
