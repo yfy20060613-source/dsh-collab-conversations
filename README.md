@@ -90,6 +90,10 @@ Real output from a machine run (2026-11-24, DSH `0.2.2-rc.5` + this plugin `0.3.
 
 Message bodies below are Chinese because that deployment's workspace language is Chinese; the plugin passes them through untouched.
 
+![The dispatched message as session B sees it](docs/screenshot-dispatch.png)
+
+<sub>Session B's view of the actual test message. The header (`from` / `correlation` / `hop`) and the "not user authorization" note are prepended by the plugin; the sidebar shows the two sibling sessions.</sub>
+
 **1) A finds B's id**
 
 ```text
@@ -98,6 +102,8 @@ session_list
   - session-ab40488d-… — 对话二 (live, saved)
     cwd: C:\Users\…\default-workspace
 ```
+
+![Two sibling sessions in the sidebar](docs/screenshot-sessions.png)
 
 **2) A dispatches**
 

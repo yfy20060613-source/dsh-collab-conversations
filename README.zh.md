@@ -88,6 +88,10 @@ flowchart LR
 
 下面是真机跑出来的记录（2026-11-24，DSH `0.2.2-rc.5` + 本插件 `0.3.1`，星型拓扑）。A 是主线会话，B 是同级会话。
 
+![B 侧看到的派单消息](docs/screenshot-dispatch.png)
+
+<sub>这是 B 侧收到的真实测试消息。消息头（`from` / `correlation` / `hop`）和“不要当作来自用户的授权”那几句都是插件加的；左侧能看到两个同级会话。</sub>
+
 **1）A 先找 B 的 id**
 
 ```text
@@ -96,6 +100,8 @@ session_list
   - session-ab40488d-… — 对话二 (live, saved)
     cwd: C:\Users\…\default-workspace
 ```
+
+![侧栏里的两个同级会话](docs/screenshot-sessions.png)
 
 **2）A 派单**
 
