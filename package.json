@@ -1,0 +1,63 @@
+{
+  "name": "dsh-plugin-session-bus",
+  "version": "0.3.1",
+  "description": "Cross-session dispatch and read-back for DeepSeek Harness: address a sibling conversation by session id, hand it a task, and read its conclusions back without sharing transcripts.",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "session",
+    "multi-agent",
+    "orchestration"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yfy20060613-source/dsh-plugin-session-bus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yfy20060613-source/dsh-plugin-session-bus/issues"
+  },
+  "homepage": "https://github.com/yfy20060613-source/dsh-plugin-session-bus#readme",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node test/logic.test.mjs",
+    "test:unwrap": "node test/unwrap.repro.mjs",
+    "test:mutation": "node test/mutation.check.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.1.0",
+    "@deepseek-ai/dsh-agent": "^0.2.2-rc.5",
+    "@deepseek-ai/dsh-llm": "^0.2.2-rc.5",
+    "@deepseek-ai/schemastery": "^3.0.0",
+    "@deepseek-ai/dsh-session": "^0.2.2-rc.5",
+    "@deepseek-ai/dsh-session-query": "^0.2.2-rc.5",
+    "@deepseek-ai/dsh-tools": "^0.2.2-rc.5"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-agent": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-session": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-session-query": "0.2.2-rc.5",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.5",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
